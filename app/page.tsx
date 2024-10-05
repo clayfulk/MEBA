@@ -37,7 +37,7 @@ export default function LandingPage() {
               <div className="flex flex-col items-center space-y-4 text-center">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                    Members' Employment and Benefits Assistant
+                    Members&apos; Employment and Benefits Assistant
                   </h1>
                   <p className="text-xl font-semibold text-primary">Your Union, Simplified</p>
                   <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
