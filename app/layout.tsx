@@ -1,18 +1,15 @@
-import type { Metadata } from "next";
-import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "My Photo Gallery",
-};
+import './globals.css';
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
-      <body className="bg-neutral-50 text-neutral-950">{children}</body>
+      <body>{children}</body>
     </html>
-  );
+  )
 }
+import './globals.css';

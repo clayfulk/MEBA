@@ -1,0 +1,23 @@
+.topLeftLogo {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.smallLogo {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.centeredLogo {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.fullLogo {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* Your existing styles */
