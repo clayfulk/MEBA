@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileText, MessageCircle, Shield, Users, Clock, Database, Lock, Zap } from "lucide-react"
+import { BookOpen } from 'lucide-react'
+import styles from './page.module.css'
 
 export default function Home() {
   const [showLogin, setShowLogin] = useState(false)
@@ -28,6 +30,29 @@ export default function Home() {
 function LandingPage({ onLogin }: { onLogin: () => void }) {
   return (
     <>
+      <style jsx>{`
+        .topLeftLogo {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+        }
+
+        .smallLogo {
+          border-radius: 20px;
+          overflow: hidden;
+        }
+
+        .centeredLogo {
+          display: flex;
+          justify-content: center;
+          margin-top: 10px; /* Reduced margin-top */
+        }
+
+        .fullLogo {
+          border-radius: 20px;
+          overflow: hidden;
+        }
+      `}</style>
       <header className="px-4 lg:px-6 h-14 flex items-center">
         <Link className="flex items-center justify-center" href="#">
           <Image
@@ -67,7 +92,7 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
               />
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                  Members' Employment and Benefits Assistant
+                  Members&apos; Employment and Benefits Assistant
                 </h1>
                 <p className="text-xl font-semibold text-primary">Your Union, Simplified</p>
                 <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
@@ -262,19 +287,19 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <Card>
                 <CardContent className="pt-6">
-                  <p className="text-gray-600 mb-4">"MEBA has revolutionized how I access my union information. It's like having a knowledgeable union rep available 24/7!"</p>
+                <p className="text-gray-600 mb-4">&quot;MEBA has revolutionized how I access my union information. It&apos;s like having a knowledgeable union rep available 24/7!&quot;</p>
                   <p className="font-semibold">- Sarah J., Union Member</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
-                  <p className="text-gray-600 mb-4">"As a union administrator, MEBA has significantly reduced our workload. Members get instant answers, and we can focus on more complex issues."</p>
+                  <p className="text-gray-600 mb-4">&quot;As a union administrator, MEBA has significantly reduced our workload. Members get instant answers, and we can focus on more complex issues.&quot;</p>
                   <p className="font-semibold">- Michael T., Union Administrator</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
-                  <p className="text-gray-600 mb-4">"The AI chatbot is incredibly accurate and helpful. It's made understanding my benefits so much easier!"</p>
+                <p className="text-gray-600 mb-4">&quot;The AI chatbot is incredibly accurate and helpful. It&apos;s made understanding my benefits so much easier!&quot;</p>
                   <p className="font-semibold">- Emily R., New Union Member</p>
                 </CardContent>
               </Card>
@@ -410,7 +435,7 @@ function LoginForm({ onBackToHome }: { onBackToHome: () => void }) {
             Forgot your password?
           </Button>
           <div className="text-sm text-muted-foreground">
-            Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
             <Button variant="link" className="p-0 text-primary">
               Contact your union administrator
             </Button>
