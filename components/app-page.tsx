@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileText, MessageCircle, Shield, Users, Clock, Database, Zap } from "lucide-react"
 
-export default function Home() {
+export function Page() {
   const [showLogin, setShowLogin] = useState(false)
   return (
     <div className="flex flex-col min-h-screen">
