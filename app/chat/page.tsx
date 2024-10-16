@@ -171,7 +171,7 @@ export default function ChatPage() {
           <form onSubmit={handleFormSubmit} className="flex items-center space-x-2">
             <Input
               type="text"
-              placeholder="Ask about MEBA agreements..."
+              placeholder="Ask MEBA..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               className="flex-1"
