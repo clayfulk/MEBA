@@ -1,5 +1,7 @@
+// layout.tsx
 
-import './globals.css';
+// Ensure the path to globals.css is correct
+import '../styles/globals.css'; // Adjust the path as necessary
 
 export default function RootLayout({
   children,
@@ -12,4 +14,3 @@ export default function RootLayout({
     </html>
   )
 }
-import './globals.css';
