@@ -30,7 +30,7 @@ export default function ChatPage() {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [selectedDocuments, setSelectedDocuments] = useState<string[]>([])
+  const [linkedDocuments, setLinkedDocuments] = useState<string[]>([])
   const router = useRouter()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -55,7 +55,7 @@ export default function ChatPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ messages: [...messages, userMessage], documents: selectedDocuments }),
+        body: JSON.stringify({ messages: [...messages, userMessage], linkedDocuments }),
       });
 
       if (!response.ok) {
@@ -83,7 +83,7 @@ export default function ChatPage() {
   }
 
   const toggleDocument = (documentId: string) => {
-    setSelectedDocuments(prev => 
+    setLinkedDocuments(prev => 
       prev.includes(documentId)
         ? prev.filter(id => id !== documentId)
         : [...prev, documentId]
@@ -157,7 +157,11 @@ export default function ChatPage() {
                     {message.role === "user" ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                   </div>
                   <div className={`max-w-[70%] rounded-lg px-4 py-2 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
-                    {message.content}
+                    {message.role === "user" ? (
+                      message.content
+                    ) : (
+                      <div dangerouslySetInnerHTML={{ __html: message.content }} />
+                    )}
                   </div>
                 </div>
               </div>
@@ -171,7 +175,7 @@ export default function ChatPage() {
           <form onSubmit={handleFormSubmit} className="flex items-center space-x-2">
             <Input
               type="text"
-              placeholder="Ask MEBA..."
+              placeholder="Ask MEBAssistant..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               className="flex-1"
@@ -189,14 +193,14 @@ export default function ChatPage() {
 
       {/* Right Sidebar */}
       <div className="w-56 bg-secondary p-4">
-        <h2 className="font-semibold mb-4">Document Links</h2>
+        <h2 className="font-semibold mb-4">Linked Documents</h2>
         <div className="space-y-2">
           {documents.map((doc) => (
             <Button 
               key={doc.id}
-              variant={selectedDocuments.includes(doc.id) ? 'secondary' : 'ghost'} 
+              variant={linkedDocuments.includes(doc.id) ? 'secondary' : 'ghost'} 
               className={`w-full justify-start ${
-                selectedDocuments.includes(doc.id) 
+                linkedDocuments.includes(doc.id) 
                   ? 'border-2 border-primary rounded-md' 
                   : 'border border-transparent'
               }`}
