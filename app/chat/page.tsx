@@ -10,10 +10,11 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Send, Bot, User } from "lucide-react"
 
-function ChatPage() {
+export default function ChatPage() {
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -24,6 +25,7 @@ function ChatPage() {
     setMessages((prev) => [...prev, userMessage])
     setInput("")
     setIsLoading(true)
+    setError(null)
 
     try {
       const response = await fetch('/api/chat', {
@@ -43,7 +45,7 @@ function ChatPage() {
       setMessages((prev) => [...prev, assistantMessage])
     } catch (error) {
       console.error("Error calling chat API:", error);
-      setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${(error as Error).message}. Please try again.` }])
+      setError(`Error: ${error.message}. Please try again.`);
     } finally {
       setIsLoading(false)
     }
@@ -86,6 +88,14 @@ function ChatPage() {
                   </div>
                 </div>
               ))}
+              {error && (
+                <div className="flex justify-center mb-4">
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong className="font-bold">Error: </strong>
+                    <span className="block sm:inline">{error}</span>
+                  </div>
+                </div>
+              )}
             </ScrollArea>
           </CardContent>
           <CardFooter>
@@ -109,5 +119,3 @@ function ChatPage() {
     </div>
   )
 }
-
-export default ChatPage
