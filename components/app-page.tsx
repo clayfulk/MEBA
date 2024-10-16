@@ -9,7 +9,22 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, MessageCircle, Shield, Users, Clock, Database, Zap } from "lucide-react"
+import { FileText, MessageCircle, Shield, Users, Clock, Database, Zap, Menu, User } from "lucide-react"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function Page() {
   const [showLogin, setShowLogin] = useState(false)
@@ -25,69 +40,106 @@ export function Page() {
 }
 
 function LandingPage({ onLogin }: { onLogin: () => void }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
   return (
     <>
-      <style jsx>{`
-        .topLeftLogo {
-          position: absolute;
-          top: 10px;
-          left: 10px;
-        }
-
-        .smallLogo {
-          border-radius: 20px;
-          overflow: hidden;
-        }
-
-        .centeredLogo {
-          display: flex;
-          justify-content: center;
-          margin-top: 10px;
-        }
-
-        .fullLogo {
-          border-radius: 20px;
-          overflow: hidden;
-        }
-      `}</style>
-      <header className="px-4 lg:px-6 h-14 flex items-center">
+      <header className="px-4 lg:px-6 h-14 flex items-center border-b">
         <Link className="flex items-center justify-center" href="#">
           <Image
             src="/images/logo.png"
             alt="MEBA App Logo"
-            width={48}
-            height={48}
-            className="mr-2 rounded-md object-cover"
+            width={32}
+            height={32}
+            className="rounded-md object-cover"
             priority
           />
-          <span className="ml-2 text-2xl font-bold !text-gray-800">MEBA</span>
+          <span className="ml-2 text-lg font-semibold">MEBA</span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
+        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
+          <Link className="text-sm font-medium hover:underline underline-offset-4 hidden md:block" href="#features">
             Features
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#how-it-works">
+          <Link className="text-sm font-medium hover:underline underline-offset-4 hidden md:block" href="#how-it-works">
             How It Works
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#benefits">
+          <Link className="text-sm font-medium hover:underline underline-offset-4 hidden md:block" href="#benefits">
             Benefits
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#testimonials">
+          <Link className="text-sm font-medium hover:underline underline-offset-4 hidden md:block" href="#testimonials">
             Testimonials
           </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <User className="h-5 w-5" />
+                <span className="sr-only">Toggle user menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onLogin}>Login</DropdownMenuItem>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem>Support</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col gap-4 mt-4">
+                <Link
+                  className="text-sm font-medium hover:underline underline-offset-4"
+                  href="#features"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Features
+                </Link>
+                <Link
+                  className="text-sm font-medium hover:underline underline-offset-4"
+                  href="#how-it-works"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  How It Works
+                </Link>
+                <Link
+                  className="text-sm font-medium hover:underline underline-offset-4"
+                  href="#benefits"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Benefits
+                </Link>
+                <Link
+                  className="text-sm font-medium hover:underline underline-offset-4"
+                  href="#testimonials"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Testimonials
+                </Link>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </nav>
       </header>
       <main className="flex-1">
-        <section className="w-full py-8 md:py-12 lg:py-16 xl:py-20">
+        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-background to-secondary/20">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="centeredLogo">
+              <div className="relative w-32 h-32 md:w-48 md:h-48">
                 <Image
                   src="/images/logo.png"
                   alt="MEBA App Logo"
-                  width={180}
-                  height={180}
-                  className="mb-4 rounded-md object-cover fullLogo"
+                  layout="fill"
+                  objectFit="cover"
+                  className="rounded-md"
                   priority
                 />
               </div>
@@ -102,16 +154,16 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
                 </p>
               </div>
               <div className="space-x-4">
-                <Button onClick={onLogin} size="lg">Get Started</Button>
-                <Button variant="outline" size="lg">Learn More</Button>
+                <Button onClick={onLogin} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">Get Started</Button>
+                <Button variant="outline" size="lg" className="bg-background text-primary hover:bg-secondary/20">Learn More</Button>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="features" className="w-full py-8 md:py-12 lg:py-16 bg-white">
+        <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-background">
           <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8">Key Features</h2>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12">Key Features</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <Card>
                 <CardHeader>
@@ -183,12 +235,12 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
           </div>
         </section>
 
-        <section id="how-it-works" className="w-full py-8 md:py-12 lg:py-16 bg-gray-50">
+        <section id="how-it-works" className="w-full py-12 md:py-24 lg:py-32 bg-secondary/10">
           <div className="container px-4 md:px-6">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12">How It Works</h2>
             <ol className="space-y-8">
               <li className="flex items-center space-x-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-md bg-primary text-white flex items-center justify-center text-lg font-bold">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold">
                   1
                 </div>
                 <div>
@@ -197,7 +249,7 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
                 </div>
               </li>
               <li className="flex items-center space-x-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-md bg-primary text-white flex items-center justify-center text-lg font-bold">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold">
                   2
                 </div>
                 <div>
@@ -206,7 +258,7 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
                 </div>
               </li>
               <li className="flex items-center space-x-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-md bg-primary text-white flex items-center justify-center text-lg font-bold">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold">
                   3
                 </div>
                 <div>
@@ -215,7 +267,7 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
                 </div>
               </li>
               <li className="flex items-center space-x-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-md bg-primary text-white flex items-center justify-center text-lg font-bold">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold">
                   4
                 </div>
                 <div>
@@ -224,7 +276,7 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
                 </div>
               </li>
               <li className="flex items-center space-x-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-md bg-primary text-white flex items-center justify-center text-lg font-bold">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold">
                   5
                 </div>
                 <div>
@@ -236,7 +288,7 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
           </div>
         </section>
 
-        <section id="benefits" className="w-full py-8 md:py-12 lg:py-16 bg-white">
+        <section id="benefits" className="w-full py-12 md:py-24 lg:py-32 bg-background">
           <div className="container px-4 md:px-6">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12">Benefits</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -269,6 +321,7 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
                 <CardContent>
                   <ul className="list-disc pl-5 space-y-2">
                     <li>Streamlined communication with members</li>
+                    
                     <li>Reduced workload for administrative staff</li>
                     <li>Improved member engagement and satisfaction</li>
                     <li>Easy document management and updates</li>
@@ -282,7 +335,7 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
           </div>
         </section>
 
-        <section id="testimonials" className="w-full py-8 md:py-12 lg:py-16 bg-gray-50">
+        <section id="testimonials" className="w-full py-12 md:py-24 lg:py-32 bg-secondary/10">
           <div className="container px-4 md:px-6">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12">What Our Users Say</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -301,14 +354,14 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-gray-600 mb-4">&quot;The AI chatbot is incredibly accurate and helpful. It&apos;s made understanding my benefits so much easier!&quot;</p>
-                  <p  className="font-semibold">- Emily R., New Union Member</p>
+                  <p className="font-semibold">- Emily R., New Union Member</p>
                 </CardContent>
               </Card>
             </div>
           </div>
         </section>
 
-        <section className="w-full py-8 md:py-12 lg:py-16 bg-primary text-white">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-primary text-primary-foreground">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center space-y-4 text-center">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
