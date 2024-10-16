@@ -10,8 +10,13 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Send, Bot, User } from "lucide-react"
 
+type Message = {
+  role: "user" | "assistant"
+  content: string
+}
+
 export default function ChatPage() {
-  const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([])
+  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -21,7 +26,7 @@ export default function ChatPage() {
     e.preventDefault()
     if (!input.trim() || isLoading) return
 
-    const userMessage = { role: "user" as const, content: input }
+    const userMessage: Message = { role: "user", content: input }
     setMessages((prev) => [...prev, userMessage])
     setInput("")
     setIsLoading(true)
@@ -37,15 +42,15 @@ export default function ChatPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'API request failed');
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'API request failed')
       }
 
-      const assistantMessage = await response.json();
+      const assistantMessage: Message = await response.json()
       setMessages((prev) => [...prev, assistantMessage])
     } catch (error) {
-      console.error("Error calling chat API:", error);
-      setError(`Error: ${error.message}. Please try again.`);
+      console.error("Error calling chat API:", error)
+      setError(error instanceof Error ? error.message : 'An unknown error occurred')
     } finally {
       setIsLoading(false)
     }
