@@ -1,32 +1,49 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Send, Bot, User } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Send, Bot, User, Plus, RefreshCw } from "lucide-react"
 
 type Message = {
   role: "user" | "assistant"
   content: string
 }
 
+type Document = {
+  id: string
+  name: string
+}
+
+const documents: Document[] = [
+  { id: 'crowley', name: 'Crowley MOU' },
+  { id: 'express', name: 'Express Class' },
+  { id: 'drycargo', name: 'Dry Cargo Agreement' },
+]
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedDocuments, setSelectedDocuments] = useState<string[]>([])
   const router = useRouter()
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!input.trim() || isLoading) return
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
 
-    const userMessage: Message = { role: "user", content: input }
+  useEffect(scrollToBottom, [messages])
+
+  const handleSendMessage = async (content: string) => {
+    if (!content.trim() || isLoading) return
+
+    const userMessage: Message = { role: "user", content }
     setMessages((prev) => [...prev, userMessage])
     setInput("")
     setIsLoading(true)
@@ -38,7 +55,7 @@ export default function ChatPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ messages: [...messages, userMessage] }),
+        body: JSON.stringify({ messages: [...messages, userMessage], documents: selectedDocuments }),
       });
 
       if (!response.ok) {
@@ -56,71 +73,140 @@ export default function ChatPage() {
     }
   }
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    handleSendMessage(input)
+  }
+
+  const handleSuggestedPrompt = (prompt: string) => {
+    handleSendMessage(prompt)
+  }
+
+  const toggleDocument = (documentId: string) => {
+    setSelectedDocuments(prev => 
+      prev.includes(documentId)
+        ? prev.filter(id => id !== documentId)
+        : [...prev, documentId]
+    )
+  }
+
+  const suggestedPrompts = [
+    'Explain the overtime rules in the Crowley MOU',
+    'Summarize the Express Class benefits',
+    'What are the key points in the Dry Cargo agreement?',
+    'Compare vacation policies across agreements'
+  ]
+
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <header className="px-4 lg:px-6 h-14 flex items-center border-b">
-        <Link className="flex items-center justify-center" href="/">
-          <Image
-            src="/images/logo.png"
-            alt="MEBA App Logo"
-            width={32}
-            height={32}
-            className="rounded-md object-cover"
-            priority
-          />
-          <span className="ml-2 text-lg font-semibold">MEBA Chat</span>
-        </Link>
-        <nav className="ml-auto">
-          <Button variant="ghost" onClick={() => router.push("/")}>Back to Home</Button>
-        </nav>
-      </header>
-      <main className="flex-1 p-4 md:p-6 flex flex-col">
-        <Card className="flex-1 flex flex-col">
-          <CardHeader>
-            <CardTitle>Chat with MEBA</CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1 overflow-hidden">
-            <ScrollArea className="h-[calc(100vh-16rem)]">
-              {messages.map((message, index) => (
-                <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} mb-4`}>
-                  <div className={`flex items-start ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"} mr-2`}>
-                      {message.role === "user" ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
-                    </div>
-                    <div className={`max-w-[75%] rounded-lg px-4 py-2 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
-                      {message.content}
-                    </div>
+    <div className="flex h-screen bg-background text-foreground">
+      {/* Left Sidebar */}
+      <div className="w-56 bg-secondary p-4 flex flex-col">
+        <Button className="mb-4" onClick={() => setMessages([])}>
+          <Plus className="mr-2 h-4 w-4" /> New Chat
+        </Button>
+        <div className="flex-grow">
+          {/* Chat history could go here */}
+        </div>
+        <Button variant="outline" className="mt-auto">
+          Upgrade to Plus
+        </Button>
+      </div>
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="bg-secondary p-2 flex justify-between items-center">
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/images/logo.png"
+              alt="MEBA Logo"
+              width={32}
+              height={32}
+              className="mr-2"
+            />
+            <span className="text-xl font-bold">MEBA Chat</span>
+          </Link>
+          <Button variant="ghost" size="icon" onClick={() => setMessages([])}>
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </header>
+
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-auto p-4">
+          {messages.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center">
+              <div className="grid grid-cols-2 gap-4 max-w-2xl">
+                {suggestedPrompts.map((prompt, index) => (
+                  <Card 
+                    key={index} 
+                    className="p-3 cursor-pointer hover:bg-secondary/50 transition-colors"
+                    onClick={() => handleSuggestedPrompt(prompt)}
+                  >
+                    <CardContent className="p-0">
+                      <p className="font-medium text-sm">{prompt}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          ) : (
+            messages.map((message, index) => (
+              <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} mb-4`}>
+                <div className={`flex items-start ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"} mr-2`}>
+                    {message.role === "user" ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
+                  </div>
+                  <div className={`max-w-[70%] rounded-lg px-4 py-2 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
+                    {message.content}
                   </div>
                 </div>
-              ))}
-              {error && (
-                <div className="flex justify-center mb-4">
-                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <strong className="font-bold">Error: </strong>
-                    <span className="block sm:inline">{error}</span>
-                  </div>
-                </div>
-              )}
-            </ScrollArea>
-          </CardContent>
-          <CardFooter>
-            <form onSubmit={handleSendMessage} className="flex w-full items-center space-x-2">
-              <Input
-                type="text"
-                placeholder="Type your message..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                className="flex-1"
-                disabled={isLoading}
-              />
-              <Button type="submit" size="icon" disabled={isLoading}>
-                <Send className="h-4 w-4" />
-                <span className="sr-only">Send message</span>
-              </Button>
-            </form>
-          </CardFooter>
-        </Card>
-      </main>
+              </div>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input Area */}
+        <div className="p-4 bg-background">
+          <form onSubmit={handleFormSubmit} className="flex items-center space-x-2">
+            <Input
+              type="text"
+              placeholder="Ask about MEBA agreements..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className="flex-1"
+              disabled={isLoading}
+            />
+            <Button type="submit" disabled={isLoading}>
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
+          {error && (
+            <p className="text-destructive mt-2">{error}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Right Sidebar */}
+      <div className="w-56 bg-secondary p-4">
+        <h2 className="font-semibold mb-4">Document Links</h2>
+        <div className="space-y-2">
+          {documents.map((doc) => (
+            <Button 
+              key={doc.id}
+              variant={selectedDocuments.includes(doc.id) ? 'secondary' : 'ghost'} 
+              className={`w-full justify-start ${
+                selectedDocuments.includes(doc.id) 
+                  ? 'border-2 border-primary rounded-md' 
+                  : 'border border-transparent'
+              }`}
+              onClick={() => toggleDocument(doc.id)}
+            >
+              {doc.name}
+            </Button>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
