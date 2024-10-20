@@ -7,7 +7,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Send, Bot, User, Plus, RefreshCw } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Send, Bot, User, Plus, RefreshCw, Menu } from "lucide-react"
 
 type Message = {
   role: "user" | "assistant"
@@ -30,7 +31,7 @@ export default function ChatPage() {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [selectedDocuments, setSelectedDocuments] = useState<string[]>([])
+  const [linkedDocuments, setLinkedDocuments] = useState<string[]>([])
   const router = useRouter()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -55,7 +56,7 @@ export default function ChatPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ messages: [...messages, userMessage], documents: selectedDocuments }),
+        body: JSON.stringify({ messages: [...messages, userMessage], linkedDocuments }),
       });
 
       if (!response.ok) {
@@ -83,7 +84,7 @@ export default function ChatPage() {
   }
 
   const toggleDocument = (documentId: string) => {
-    setSelectedDocuments(prev => 
+    setLinkedDocuments(prev => 
       prev.includes(documentId)
         ? prev.filter(id => id !== documentId)
         : [...prev, documentId]
@@ -98,9 +99,54 @@ export default function ChatPage() {
   ]
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
-      {/* Left Sidebar */}
-      <div className="w-56 bg-secondary p-4 flex flex-col">
+    <div className="flex flex-col h-screen bg-background text-foreground md:flex-row">
+      {/* Mobile Header */}
+      <header className="bg-secondary p-2 flex justify-between items-center md:hidden">
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/images/logo.png"
+            alt="MEBA Logo"
+            width={32}
+            height={32}
+            className="mr-2"
+          />
+          <span className="text-xl font-bold">MEBA Chat</span>
+        </Link>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[250px] sm:w-[300px]">
+            <div className="py-4">
+              <Button className="w-full mb-4" onClick={() => setMessages([])}>
+                <Plus className="mr-2 h-4 w-4" /> New Chat
+              </Button>
+              <div className="space-y-2">
+                <h2 className="font-semibold mb-2">Linked Documents</h2>
+                {documents.map((doc) => (
+                  <Button 
+                    key={doc.id}
+                    variant={linkedDocuments.includes(doc.id) ? 'secondary' : 'ghost'} 
+                    className={`w-full justify-start ${
+                      linkedDocuments.includes(doc.id) 
+                        ? 'border-2 border-primary rounded-md' 
+                        : 'border border-transparent'
+                    }`}
+                    onClick={() => toggleDocument(doc.id)}
+                  >
+                    {doc.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </header>
+
+      {/* Left Sidebar (hidden on mobile) */}
+      <div className="hidden md:flex md:w-56 bg-secondary p-4 flex-col">
         <Button className="mb-4" onClick={() => setMessages([])}>
           <Plus className="mr-2 h-4 w-4" /> New Chat
         </Button>
@@ -114,8 +160,8 @@ export default function ChatPage() {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-secondary p-2 flex justify-between items-center">
+        {/* Desktop Header (hidden on mobile) */}
+        <header className="hidden md:flex bg-secondary p-2 justify-between items-center">
           <Link href="/" className="flex items-center">
             <Image
               src="/images/logo.png"
@@ -135,7 +181,7 @@ export default function ChatPage() {
         <div className="flex-1 overflow-auto p-4">
           {messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center">
-              <div className="grid grid-cols-2 gap-4 max-w-2xl">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl px-4">
                 {suggestedPrompts.map((prompt, index) => (
                   <Card 
                     key={index} 
@@ -157,7 +203,11 @@ export default function ChatPage() {
                     {message.role === "user" ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                   </div>
                   <div className={`max-w-[70%] rounded-lg px-4 py-2 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
-                    {message.content}
+                    {message.role === "user" ? (
+                      message.content
+                    ) : (
+                      <div dangerouslySetInnerHTML={{ __html: message.content }} />
+                    )}
                   </div>
                 </div>
               </div>
@@ -171,7 +221,7 @@ export default function ChatPage() {
           <form onSubmit={handleFormSubmit} className="flex items-center space-x-2">
             <Input
               type="text"
-              placeholder="Ask MEBA..."
+              placeholder="Ask MEBAssistant..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               className="flex-1"
@@ -187,16 +237,16 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Right Sidebar */}
-      <div className="w-56 bg-secondary p-4">
-        <h2 className="font-semibold mb-4">Document Links</h2>
+      {/* Right Sidebar (hidden on mobile) */}
+      <div className="hidden md:block w-56 bg-secondary p-4">
+        <h2 className="font-semibold mb-4">Linked Documents</h2>
         <div className="space-y-2">
           {documents.map((doc) => (
             <Button 
               key={doc.id}
-              variant={selectedDocuments.includes(doc.id) ? 'secondary' : 'ghost'} 
+              variant={linkedDocuments.includes(doc.id) ? 'secondary' : 'ghost'} 
               className={`w-full justify-start ${
-                selectedDocuments.includes(doc.id) 
+                linkedDocuments.includes(doc.id) 
                   ? 'border-2 border-primary rounded-md' 
                   : 'border border-transparent'
               }`}
